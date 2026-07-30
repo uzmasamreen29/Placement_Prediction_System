@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #111;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, p {
+            text-align: center;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            background: #222;
+        }
+
+        .green { background: #1a4d1a; }
+        .red { background: #4d1a1a; }
+        .blue { background: #1a1a4d; }
+        .dark { background: #333; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #1e1e1e;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        th {
+            background: #333;
+        }
+
+        .chart-box {
+            width: 300px;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>👩‍🏫 Teacher Admin Dashboard</h1>
+<p>Placement Analytics System</p>
+
+<!-- STATS -->
+<div class="stats">
+
+    <div class="card dark">
+        <h3>Total Students</h3>
+        <h2>{{ stats.total }}</h2>
+    </div>
+
+    <div class="card green">
+        <h3>Placed</h3>
+        <h2>{{ stats.placed }}</h2>
+    </div>
+
+    <div class="card red">
+        <h3>Not Placed</h3>
+        <h2>{{ stats.not_placed }}</h2>
+    </div>
+
+    <div class="card blue">
+        <h3>Success Rate</h3>
+        <h2>{{ stats.percentage }}%</h2>
+    </div>
+
+</div>
+<a href="/download_report">
+    <button style="
+        padding:10px;
+        background:#00e6ff;
+        border:none;
+        border-radius:8px;
+        cursor:pointer;
+        margin-bottom:15px;
+    ">
+        📄 Download Report (PDF)
+    </button>
+</a>
+
+<!-- PIE CHART -->
+<div class="chart-box">
+    <canvas id="placementChart"></canvas>
+</div>
+
+<script>
+    var ctx = document.getElementById('placementChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Placed', 'Not Placed'],
+            datasets: [{
+                data: [{{ stats.placed }}, {{ stats.not_placed }}],
+                backgroundColor: ['#2ecc71', '#e74c3c']
+            }]
+        }
+    });
+</script>
+<form method="GET" action="/admin" style="margin-bottom:15px;">
+
+    <input type="text" name="search" placeholder="Search student name..." 
+           style="padding:8px; width:200px;">
+
+    <button type="submit" style="padding:8px;">
+        🔍 Search
+    </button>
+
+</form>
+<!-- TABLE -->
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>CGPA</th>
+            <th>DSA</th>
+            <th>Communication</th>
+            <th>Internships</th>
+            <th>Projects</th>
+            <th>Aptitude</th>
+            <th>Resume</th>
+            <th>Mock Interview</th>
+            <th>Result</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.id }}</td>
+            <td>{{ student.student_name }}</td>
+            <td>{{ student.cgpa }}</td>
+            <td>{{ student.dsa_skill }}</td>
+            <td>{{ student.communication }}</td>
+            <td>{{ student.internships }}</td>
+            <td>{{ student.projects }}</td>
+            <td>{{ student.aptitude }}</td>
+            <td>{{ student.resume_score }}</td>
+            <td>{{ student.mock_interview }}</td>
+            <td>
+                {% if student.result == "PLACED" %}
+                    <span style="color:lightgreen;">{{ student.result }}</span>
+                {% else %}
+                    <span style="color:orange;">{{ student.result }}</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>
